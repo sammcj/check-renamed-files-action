@@ -1,25 +1,24 @@
-name: "Send SQS Message"
-description: "Send a message to an AWS SQS queue"
+name: "Check for renamed files"
+description: "Checks if any files have been renamed between two git refs in a given path"
 branding:
-  icon: "send"
-  color: "orange"
+  icon: "edit-3"
+  color: "yellow"
 inputs:
-  sqs-url:
-    description: "SQS URL"
+  head:
+    description: "git HEAD (branch|SHA|tag)"
     required: true
     type: string
-  message:
-    description: "SQS Message Body"
+    default: "main"
+  feature:
+    description: "git feature (branch|SHA|tag)"
     required: true
     type: string
-  message-attributes:
-    description: "SQS Message Attributes"
-    required: false
-    type: map
-  message-group-id:
-    description: "SQS Message Group ID"
-    required: false
+    default: "dev"
+  path:
+    description: "Database migrations directory path"
+    required: true
     type: string
+    default: "src/main/resources/db/migration"
 runs:
   using: "node16"
   main: "index.js"

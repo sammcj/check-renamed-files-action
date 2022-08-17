@@ -8,8 +8,7 @@
       "reviewersFromCodeOwners": true,
       "addLabels": ["renovatebot", "major", "version-update"],
       "commitMessagePrefix": "Hotfix-0000/00/00 -- major",
-      "groupName": "major",
-      "extends": ["schedule:quarterly"]
+      "groupName": "major"
     },
     {
       "matchPackagePatterns": ["*"],
@@ -17,8 +16,7 @@
       "reviewersFromCodeOwners": true,
       "addLabels": ["renovatebot", "minor", "version-update"],
       "commitMessagePrefix": "Hotfix-0000/00/00 -- minor",
-      "groupName": "minor",
-      "extends": ["schedule:monthly"]
+      "groupName": "minor"
     },
     {
       "matchPackagePatterns": ["*"],
@@ -26,8 +24,7 @@
       "reviewersFromCodeOwners": true,
       "addLabels": ["renovatebot", "patch", "version-update"],
       "commitMessagePrefix": "Hotfix-0000/00/00 -- patch",
-      "groupName": "patch",
-      "extends": ["schedule:monthly"]
+      "groupName": "patch"
     },
     {
       "matchPackagePatterns": ["*"],
@@ -35,8 +32,7 @@
       "reviewersFromCodeOwners": true,
       "addLabels": ["renovatebot", "pin", "version-update"],
       "commitMessagePrefix": "Hotfix-0000/00/00 -- pin",
-      "groupName": "pin",
-      "extends": ["schedule:monthly"]
+      "groupName": "pin"
     }
   ],
   "vulnerabilityAlerts": {
