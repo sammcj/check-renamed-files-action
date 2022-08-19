@@ -7,15 +7,15 @@ import simpleGit from 'simple-git';
 import process from 'process';
 
 const head = core.getInput('head', {
-  required: false,
+  required: true,
   default: 'main',
 });
 const feature = core.getInput('feature', {
-  required: false,
+  required: true,
   default: 'dev',
 });
 const path = core.getInput('path', {
-  required: false,
+  required: true,
   default: 'src/main/resources/db/migration',
 });
 
@@ -33,6 +33,10 @@ async function run() {
       Chalk.bgMagenta.bold(path),
       Chalk.green(']\n'),
     );
+
+    // fetch both branches
+    await git.fetch(head);
+    await git.fetch(feature);
 
     const diff = await git.diff(['--name-status', head, feature, path]);
     // console.log(diff);
