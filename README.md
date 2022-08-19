@@ -22,7 +22,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: "0"
-      - uses: sammcj/check-files-action@main
+      - uses: sammcj/check-renamed-files-action@main
         with:
           head: main
           feature: dev
