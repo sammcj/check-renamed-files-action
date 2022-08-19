@@ -43,7 +43,7 @@ async function run() {
     await git.fetch(feature);
 
     // diff two git branches and print only the file names
-    const diff = await git.diff(['--name-only', head, feature]);
+    const diff = await git.diff(['--name-only', '--', head, feature]);
     console.log(diff);
 
     const modifiedFiles = diff.split('\n').filter(line => line.startsWith('R'));
