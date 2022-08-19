@@ -19,10 +19,15 @@ const path = core.getInput('path', {
   default: 'src/main/resources/db/migration',
 });
 
+// For stubbing purposes
+// const feature = 'dev'
+// const path = 'src/main/resources/db/migration'
+// const head = 'main'
+
 async function run() {
   try {
 
-    const git = simpleGit(process.cwd());
+    const git = simpleGit(path);
 
     console.log(
       Chalk.green('[ Comparing HEAD:'),
@@ -38,8 +43,9 @@ async function run() {
     await git.fetch(head);
     await git.fetch(feature);
 
-    const diff = await git.diff(['--name-status', head, feature, path]);
-    // console.log(diff);
+    // diff two git branches and print only the file names
+    const diff = await git.diff(['--name-only', head, feature]);
+    console.log(diff);
 
     const modifiedFiles = diff.split('\n').filter(line => line.startsWith('R'));
 
