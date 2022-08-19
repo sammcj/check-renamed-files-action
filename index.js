@@ -4,7 +4,6 @@
 import core from '@actions/core';
 import Chalk from 'chalk';
 import simpleGit from 'simple-git';
-import process from 'process';
 
 const head = core.getInput('head', {
   required: true,
