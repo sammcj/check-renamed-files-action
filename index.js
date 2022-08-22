@@ -68,7 +68,7 @@ async function run() {
     const modifiedFiles = diff.split('\n');
 
     if (modifiedFiles.length > 0) {
-      core.setFailed(`ERROR: Renamed files found!\n ${modifiedFiles}`);
+      core.error(`ERROR: Renamed files found!\n \u001b[38;2;255;0;0m ${modifiedFiles}`);
     } else {
       console.log(Chalk.green('No renamed files found in the path\n'));
     }
