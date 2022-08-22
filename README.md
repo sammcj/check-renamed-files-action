@@ -9,6 +9,10 @@ This action checks for renamed files between two git refs.
 - `path`: The path to the file to check.
 - `similarity`: The similarity threshold to use when comparing files, is treated as a percentage (e.g. 50 = 50%).
 
+## Outputs
+
+- `modifiedFiles`: An array of files that were renamed between the two refs.
+
 ## Usage
 
 ```yaml
