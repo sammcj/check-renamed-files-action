@@ -24,6 +24,11 @@ inputs:
     required: false
     type: number
     default: 50
+outputs:
+  modifiedFiles:
+    description: "List of modified files"
+    type: array
+    default: []
 runs:
   using: "node16"
   main: "index.js"
