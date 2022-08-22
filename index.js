@@ -52,7 +52,7 @@ async function run() {
     await git.fetch(head);
     await git.fetch(feature);
 
-    // diff two git branches and print only the file names
+    // diff two git branches for renamed files in the given path
     const diff = await git.diff([
       '--diff-filter=R',
       `--find-renames=${similarity}%`,
@@ -68,9 +68,7 @@ async function run() {
     const modifiedFiles = diff.split('\n');
 
     if (modifiedFiles.length > 0) {
-      console.log(Chalk.red('Renamed files:\n'));
-      console.log(Chalk.red(modifiedFiles));
-      core.setFailed('ERROR: Renamed files found!');
+      core.setFailed('ERROR: Renamed files found!\n ' + modifiedFiles);
     } else {
       console.log(Chalk.green('No renamed files found in the path\n'));
     }

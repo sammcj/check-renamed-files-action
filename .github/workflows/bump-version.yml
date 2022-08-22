@@ -18,6 +18,12 @@ jobs:
         uses: mathieudutour/github-tag-action@v6.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: 'change version'
+        uses: reedyuk/npm-version@1.1.1
+        with:
+          version: ${{ steps.tag_version.outputs.new_tag }}
+          package: 'subproject-directory/'
+          git-tag-version: 'true'
       - name: Create a GitHub release
         uses: ncipollo/release-action@v1
         with:
