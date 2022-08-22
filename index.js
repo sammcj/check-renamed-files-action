@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* eslint-disable max-params */
 /* eslint-disable no-inner-declarations */
-import core from '@actions/core';
+import core, { ExitCode } from '@actions/core';
 // eslint-disable-next-line import/no-named-as-default
 import Chalk from 'chalk';
 // eslint-disable-next-line import/no-named-as-default
@@ -70,7 +70,9 @@ async function run() {
 
     if (modifiedFiles.length > 0) {
       core.setOutput('modified files', modifiedFilesArray);
-      core.error(`ERROR: Renamed files found: ${modifiedFiles}`);
+      console.log(modifiedFilesArray);
+      core.setFailed(`ERROR: ${modifiedFiles.length} Renamed files found!`);
+      ExitCode.Failure;
     } else {
       console.log(Chalk.green('No renamed files found in the path\n'));
     }
