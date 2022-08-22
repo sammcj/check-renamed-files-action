@@ -15,10 +15,15 @@ inputs:
     type: string
     default: "dev"
   path:
-    description: "Database migrations directory path"
-    required: true
+    description: "Path to compare"
+    required: false
     type: string
-    default: "src/main/resources/db/migration"
+    default: "./"
+  similarity:
+    description: "Similarity threshold (50 = 50%)"
+    required: false
+    type: number
+    default: 50
 runs:
   using: "node16"
   main: "index.js"
