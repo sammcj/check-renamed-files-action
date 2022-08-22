@@ -36,7 +36,6 @@
   "dependencies": {
     "@actions/core": "1.9.1",
     "chalk": "5.0.1",
-    "eslint-plugin-airbnb": "^0.0.1-security",
     "simple-git": "3.12.0"
   }
 }

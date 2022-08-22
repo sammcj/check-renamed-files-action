@@ -20,13 +20,13 @@ on:
 
 jobs:
   check-renamed-files:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: "0"
-      - uses: sammcj/check-renamed-files-action@main
-        with:
-          head: main
-          feature: dev
-          path: src/main/resources/db/migration
-          similarity: 50
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: '0'
+    - uses: sammcj/check-renamed-files-action@main
+      with:
+        head: main
+        feature: dev
+        path: src/main/resources/db/migration
+        similarity: 50
 ```

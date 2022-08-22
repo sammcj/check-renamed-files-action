@@ -36,7 +36,6 @@ const similarity = core.getInput('similarity', {
 
 async function run() {
   try {
-
     const git = simpleGit();
 
     console.log(
@@ -54,7 +53,16 @@ async function run() {
     await git.fetch(feature);
 
     // diff two git branches and print only the file names
-    const diff = await git.diff(['--diff-filter=R', `--find-renames=${similarity}%`, head, '--', path, feature, '--', path]);
+    const diff = await git.diff([
+      '--diff-filter=R',
+      `--find-renames=${similarity}%`,
+      head,
+      '--',
+      path,
+      feature,
+      '--',
+      path,
+    ]);
     console.log(diff);
 
     const modifiedFiles = diff.split('\n');
@@ -66,11 +74,9 @@ async function run() {
     } else {
       console.log(Chalk.green('No renamed files found in the path\n'));
     }
-
   } catch (error) {
     core.setFailed(error.message);
   }
 }
 
 run();
-
