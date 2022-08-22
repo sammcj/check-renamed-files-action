@@ -1,6 +1,6 @@
 {
   "name": "check-renamed-files",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Github Action to check if any files have been renamed between two git refs in a given path",
   "main": "index.js",
   "type": "module",
@@ -36,7 +36,6 @@
   "dependencies": {
     "@actions/core": "1.9.1",
     "chalk": "5.0.1",
-    "eslint-plugin-airbnb": "^0.0.1-security",
     "simple-git": "3.12.0"
   }
 }

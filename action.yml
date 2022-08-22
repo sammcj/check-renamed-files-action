@@ -15,10 +15,22 @@ inputs:
     type: string
     default: "dev"
   path:
-    description: "Database migrations directory path"
-    required: true
+    description: "Path to compare, defaults to CWD"
+    required: false
     type: string
-    default: "src/main/resources/db/migration"
+  similarity:
+    description: "Similarity threshold (50 = 50%)"
+    required: false
+    type: number
+    default: 50
+  diffFilter:
+    description: "The git diff filter to use when comparing files (R|M|A|C|D|T|U|X|B|*), defaults to R (renamed)"
+    required: false
+    type: string
+    default: R
+outputs:
+  modifiedFiles:
+    description: "List of modified files"
 runs:
   using: "node16"
   main: "index.js"
