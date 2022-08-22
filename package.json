@@ -1,6 +1,6 @@
 {
   "name": "check-renamed-files",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Github Action to check if any files have been renamed between two git refs in a given path",
   "main": "index.js",
   "type": "module",

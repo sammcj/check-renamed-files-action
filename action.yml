@@ -19,6 +19,10 @@ inputs:
     required: true
     type: string
     default: "src/main/resources/db/migration"
+  similarity: "Similarity threshold (50 = 50%)"
+    required: true
+    type: number
+    default: 50
 runs:
   using: "node16"
   main: "index.js"
