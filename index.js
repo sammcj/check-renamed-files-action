@@ -18,10 +18,10 @@ const feature = core.getInput('feature', {
   description: 'The feature branch to compare against',
   default: 'dev',
 });
-var path = core.getInput('path', {
+const path = core.getInput('path', {
   required: false,
   description: 'Path to compare, defaults to CWD',
-  default: process.cwd(),
+  default: './',
 });
 const similarity = core.getInput('similarity', {
   required: true,
@@ -36,7 +36,7 @@ const diffFilter = core.getInput('mode', {
 
 // For stubbing purposes
 // const feature = 'dev'
-// const path = process.cwd();
+// const path = './;
 // const head = 'main'
 // const similarity = '50'
 // const diffFilter = 'R'
@@ -67,7 +67,7 @@ async function run() {
       head,
       feature,
       '--',
-      path,
+      `${process.env.GITHUB_WORKSPACE}/${path}`,
     ]);
 
     const diffClean = diff.split(/\r?\n/) // Split input text into an array of lines
