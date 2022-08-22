@@ -55,7 +55,7 @@ async function run() {
       Chalk.green(']\n'),
     );
 
-    // // fetch both branches
+    // fetch both refs
     await git.fetch(head);
     await git.fetch(feature);
 
@@ -69,12 +69,15 @@ async function run() {
       '--',
       path,
     ]);
-    console.log(diff);
 
-    const modifiedFiles = diff.trim().split('\n');
+    const diffClean = diff.split(/\r?\n/) // Split input text into an array of lines
+      .filter(line => line.trim() !== '') // Filter out lines that are empty or contain only whitespace
+      .join('\n'); // Join line array into a string
+
+    const modifiedFiles = diffClean.split('\n');
     const modifiedFilesArray = modifiedFiles.map((file) => file.split('\n'));
 
-    if (modifiedFiles.length > 0) {
+    if (modifiedFiles.length > 1) {
       core.setOutput(`modified files with filter ${diffFilter} found in ${path}:`, modifiedFilesArray);
       console.log(modifiedFilesArray);
       core.setFailed(`ERROR: ${modifiedFiles.length} Modified files with filter ${diffFilter} found in ${path} !`);
