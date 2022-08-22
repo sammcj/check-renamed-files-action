@@ -70,7 +70,7 @@ async function run() {
 
     if (modifiedFiles.length > 0) {
       core.setOutput('modified files', modifiedFilesArray);
-      core.error(`ERROR: Renamed files found: ${modifiedFilesArray}`);
+      core.error(`ERROR: Renamed files found: ${modifiedFiles}`);
     } else {
       console.log(Chalk.green('No renamed files found in the path\n'));
     }
