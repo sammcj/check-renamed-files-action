@@ -1,0 +1,24 @@
+name: "Check for renamed files"
+description: "Checks if any files have been renamed between two git refs in a given path"
+branding:
+  icon: "edit-3"
+  color: "yellow"
+inputs:
+  head:
+    description: "git HEAD (branch|SHA|tag)"
+    required: true
+    type: string
+    default: "main"
+  feature:
+    description: "git feature (branch|SHA|tag)"
+    required: true
+    type: string
+    default: "dev"
+  path:
+    description: "Database migrations directory path"
+    required: true
+    type: string
+    default: "src/main/resources/db/migration"
+runs:
+  using: "node16"
+  main: "index.js"
