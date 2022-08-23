@@ -56,7 +56,7 @@ if (process.env.GITHUB_WORKSPACE) {
   feature = 'dev'; //`origin/dev`
   similarity = '50';
   diffFilter = 'R';
-  path = process.cwd();
+  path = '';
   process.env.GITHUB_WORKSPACE = process.cwd()
 }
 
@@ -79,7 +79,6 @@ async function run() {
       Chalk.green(']\n'),
     );
 
-
     if (isGithub) {
       // fetch both refs
       await git.fetch(head);
@@ -87,7 +86,6 @@ async function run() {
     }
 
     if (debug === true) {
-      process.env.DEBUG='simple-git:task:*,simple-git:output:*'
       console.log(
         Chalk.red(
           '\n#### START DEBUG####\n',
@@ -127,7 +125,7 @@ async function run() {
     const modifiedFiles = diffClean.split('\n');
     const modifiedFilesArray = modifiedFiles.map((file) => file.split('\n'));
 
-    if (modifiedFiles.length > 1) {
+    if (modifiedFiles.length > 0) {
       const errorString = `ERROR ${modifiedFiles.length} modified files with filter ${diffFilter} found in ${path} !`
       console.log(errorString, modifiedFilesArray);
       core.setFailed(errorString);
