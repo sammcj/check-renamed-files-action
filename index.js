@@ -108,6 +108,8 @@ async function run() {
         ))
     }
 
+    await git.checkout(feature);
+
     // diff two git branches for renamed files in the given path
     const diff = await git.diff([
       '--name-only',
