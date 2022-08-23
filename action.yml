@@ -10,7 +10,7 @@ inputs:
     type: string
     default: "origin/main"
   feature:
-    description: "git feature (branch|SHA|tag) usually the branch you're running this from"
+    description: "git feature (branch|SHA|tag) usually the branch you're running this from, recommended to use github.ref_name"
     required: true
     type: string
     default: "dev"
@@ -28,6 +28,11 @@ inputs:
     required: false
     type: string
     default: "R"
+  checkFileNameDates:
+    description: "Enables checking of dates in file names with the format VYYYY.MM.DD.NNNN, e.g. V2022.02.02.2024"
+    required: false
+    type: boolean
+    default: false
   debug:
     description: "Enable debug output"
     required: false
