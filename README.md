@@ -19,6 +19,7 @@ This action checks for renamed files between two git refs.
 
 ```yaml
 name: Check for renamed files
+
 on:
   merge:
     branches:
@@ -38,3 +39,21 @@ jobs:
         diffFilter: R
         debug: false
 ```
+
+## Filters
+
+This Action uses standard git diff filters.
+
+Any combination of the filter characters (including none) can be used.
+
+When `*` (All-or-none) is added to the combination, all paths are selected if there is any file that matches other criteria in the comparison; if there is no file that matches other criteria, nothing is selected.
+
+- `A` - Select only files that are Added
+- `C` - Copied
+- `D` - Deleted
+- `M` - Modified
+- `R` - Renamed
+- `T` - Type change (i.e. regular file, symlink, submodule, …​)
+- `U` - Unmerged
+- `X` - Unknown
+- `B` - Broken symbolic link (pairing broken)

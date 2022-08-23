@@ -55,7 +55,7 @@ if (process.env.GITHUB_WORKSPACE) {
   head = 'main'; // `origin/main`
   feature = 'dev'; //`origin/dev`
   similarity = '50';
-  diffFilter = 'R';
+  diffFilter = 'A';
   path = '';
   process.env.GITHUB_WORKSPACE = process.cwd()
 }
@@ -70,13 +70,12 @@ async function run() {
     const git = simpleGit(path);
 
     const currentBranch = await (await git.raw('rev-parse', '--abbrev-ref', 'HEAD')).trimEnd();
+    // a loop
 
     if (currentBranch !== feature) {
       core.setFailed(`Current branch is ${JSON.stringify(currentBranch)}, expected ${feature}`);
       return ExitCode.Failure;
     }
-
-    // TODO: Detect if any modified files in the feature branch have an older datestamp in the name that existing files in the HEAD branch
 
     console.log(
       Chalk.green('[ Comparing HEAD:'),
@@ -127,16 +126,57 @@ async function run() {
       path,
     ]);
 
+    // Alert if there are any modified files with the given filter
     const modifiedFiles = diff.trim().split('\n')
 
     if (modifiedFiles.length > 0) {
       const errorString = `ERROR ${modifiedFiles.length} modified files with filter ${diffFilter} found in ${path} !`
-      console.log(errorString, '\n', modifiedFiles);
+      core.setFailed(errorString);
+      ExitCode.Failure;
+      console.log(Chalk.red(
+        errorString,
+        '\n',
+        'Files:',
+        Chalk.bgRedBright(
+          modifiedFiles)));
       core.setFailed(errorString);
       ExitCode.Failure;
     } else {
       console.log(Chalk.green(`No modified files with filter ${diffFilter} found in ${path}\n`));
     }
+
+    // Extract the date from the filenames for each modified file (e.g. V2022.02.02.2024__my_db_migration_abc.sql)
+    const modifiedFilesDate = modifiedFiles.map(file => {
+      const date = file.match(/V(\d{4}\.\d{2}\.\d{2}\.\d{4})/);
+      return date ? date[1] : null;
+    }).filter(date => date !== null);
+
+    // Compare the dates and alert if any are older than files on the head branch (e.g. V2022.02.02.2024 vs V2021.01.01.1111)
+    const headFiles = await git.raw(['ls-tree', '-r', '--name-only', head, '--', path]);
+    const headFilesDate = headFiles.split('\n').map(file => {
+      const date = file.match(/V(\d{4}\.\d{2}\.\d{2}\.\d{4})/);
+      return date ? date[1] : null;
+    }).filter(date => date !== null);
+    const olderFiles = modifiedFilesDate.filter(date => headFilesDate.includes(date) === false);
+    if (olderFiles.length > 0) {
+      const errorString = `ERROR ${olderFiles.length} modified files are older than files on the head branch !`
+      console.log(Chalk.red(
+        errorString,
+        '\n',
+        'Files:',
+        Chalk.bgRedBright(
+          olderFiles,
+          '\n'),
+        Chalk.green(
+          'Head files:\n',
+          headFilesDate,
+        )));
+      core.setFailed(errorString);
+      ExitCode.Failure;
+    } else {
+      console.log(Chalk.green('No modified files are older than files on the head branch\n'));
+    }
+
   } catch (error) {
     core.setFailed(error.message);
   }
