@@ -90,9 +90,10 @@ async function run() {
     // diff two git branches for renamed files in the given path
     const diff = await git.diff([
       '--name-only',
-      `--diff-filter=${diffFilter}`,
-      `--find-renames=${similarity}%`,
-      `${head}..${feature}`,
+      `--diff-filter=${diffFilter || 'R' }`,
+      `--find-renames=${similarity || '50' }%`,
+      head,
+      feature,
       '--',
       `${process.env.GITHUB_WORKSPACE}/${path}`,
     ]);

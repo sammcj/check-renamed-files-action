@@ -27,7 +27,7 @@ inputs:
     description: "The git diff filter to use when comparing files (R|M|A|C|D|T|U|X|B|*), defaults to R (renamed)"
     required: false
     type: string
-    default: R
+    default: "R"
 outputs:
   modifiedFiles:
     description: "List of modified files"
