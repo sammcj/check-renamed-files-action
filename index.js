@@ -52,8 +52,8 @@ if (process.env.GITHUB_WORKSPACE) {
 } else {
   isGithub = false;
   debug = false; // ENABLE DEBUG HERE
-  head = 'origin/main';
-  feature = 'origin/dev';
+  head = 'main'; // `origin/main`
+  feature = 'dev'; //`origin/dev`
   similarity = '50';
   diffFilter = 'R';
   path = process.cwd();
@@ -84,8 +84,6 @@ async function run() {
       // fetch both refs
       await git.fetch(head);
       await git.fetch(feature);
-      // await git.checkout(head);
-      // await git.checkout(feature);
     }
 
     if (debug === true) {
