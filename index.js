@@ -126,7 +126,7 @@ async function run() {
     const modifiedFilesArray = modifiedFiles.map((file) => file.split('\n'));
 
     if (modifiedFiles.length > 0) {
-      const errorString = `ERROR ${modifiedFiles.length} modified files with filter ${diffFilter} found in ${path} !`
+      const errorString = `ERROR ${modifiedFiles.length} modified files with filter ${diffFilter} found in ${path} !\n`
       console.log(errorString, modifiedFilesArray);
       core.setFailed(errorString);
       ExitCode.Failure;
