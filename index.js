@@ -55,7 +55,7 @@ if (process.env.GITHUB_WORKSPACE) {
   head = 'origin/main';
   feature = 'origin/dev';
   similarity = '50';
-  diffFilter = 'M';
+  diffFilter = 'R';
   path = process.cwd();
   process.env.GITHUB_WORKSPACE = process.cwd()
 }
