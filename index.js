@@ -55,7 +55,7 @@ if (process.env.GITHUB_WORKSPACE) {
   head = 'main'; // `origin/main`
   feature = 'dev'; //`origin/dev`
   similarity = '50';
-  diffFilter = 'R';
+  diffFilter = 'M';
   path = '';
   process.env.GITHUB_WORKSPACE = process.cwd()
 }
@@ -137,20 +137,29 @@ async function run() {
       console.log(Chalk.green(`No modified files with filter ${diffFilter} found in ${path}\n`));
     }
 
+    // Extract the date from the filenames for each modified file (e.g. V2022.02.02.2024__my_db_migration_abc.sql)
+    const modifiedFilesDate = modifiedFiles.map(file => {
+      const date = file.match(/V(\d{4}\.\d{2}\.\d{2}\.\d{4})/);
+      return date ? date[1] : null;
+    }).filter(date => date !== null);
+
+    console.log(modifiedFilesDate)
+
+
     // Detect if any modified files in the feature branch have an older datestamp in the filename (e.g. V2022.02.02.2024__my_db_migration_abc.sql)
     // than the filenames existing in the HEAD branch (e.g. V2022.07.10.1234__existing_older_db_migration.sql), if so, fail the action.
-    const modifiedFilesWithOlderDate = modifiedFiles.filter(file => {
-      const fileName = file.split('/').pop();
-      const fileDate = fileName.split('__')[0];
-      const headFile = `${path}/${file}`;
-      const headFileDate = (
-        git.log({ file: headFile })).split('\n')[0].split(' ')[0]; //await?t
-      return fileDate < headFileDate;
-    }).length;
-    if (modifiedFilesWithOlderDate > 0) {
-      core.setFailed(`${modifiedFilesWithOlderDate} modified files in the feature branch have an older datestamp in the filename than the filenames existing in the HEAD branch.`);
-      return ExitCode.Failure;
-    }
+    // const modifiedFilesWithOlderDate = modifiedFiles.filter(file => {
+    //   const fileName = file.split('/').pop();
+    //   const fileDate = fileName.split('__')[0];
+    //   const headFile = `${path}/${file}`;
+    //   const headFileDate = (
+    //     git.log({ file: headFile })).split('\n')[0].split(' ')[0]; //await?
+    //   return fileDate < headFileDate;
+    // }).length;
+    // if (modifiedFilesWithOlderDate > 0) {
+    //   core.setFailed(`${modifiedFilesWithOlderDate} modified files in the feature branch have an older datestamp in the filename than the filenames existing in the HEAD branch.`);
+    //   return ExitCode.Failure;
+    // }
 
 
   } catch (error) {
