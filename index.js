@@ -76,8 +76,6 @@ async function run() {
       return ExitCode.Failure;
     }
 
-    // TODO: Detect if any modified files in the feature branch have an older datestamp in the name that existing files in the HEAD branch
-
     console.log(
       Chalk.green('[ Comparing HEAD:'),
       Chalk.bgGreen.bold(head),
@@ -127,6 +125,7 @@ async function run() {
       path,
     ]);
 
+    // Alert if there are any modified files with the given filter
     const modifiedFiles = diff.trim().split('\n')
 
     if (modifiedFiles.length > 0) {
@@ -137,6 +136,23 @@ async function run() {
     } else {
       console.log(Chalk.green(`No modified files with filter ${diffFilter} found in ${path}\n`));
     }
+
+    // Detect if any modified files in the feature branch have an older datestamp in the filename (e.g. V2022.02.02.2024__my_db_migration_abc.sql)
+    // than the filenames existing in the HEAD branch (e.g. V2022.07.10.1234__existing_older_db_migration.sql), if so, fail the action.
+    const modifiedFilesWithOlderDate = modifiedFiles.filter(file => {
+      const fileName = file.split('/').pop();
+      const fileDate = fileName.split('__')[0];
+      const headFile = `${path}/${file}`;
+      const headFileDate = (
+        git.log({ file: headFile })).split('\n')[0].split(' ')[0]; //await?t
+      return fileDate < headFileDate;
+    }).length;
+    if (modifiedFilesWithOlderDate > 0) {
+      core.setFailed(`${modifiedFilesWithOlderDate} modified files in the feature branch have an older datestamp in the filename than the filenames existing in the HEAD branch.`);
+      return ExitCode.Failure;
+    }
+
+
   } catch (error) {
     core.setFailed(error.message);
   }
