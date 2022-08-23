@@ -51,7 +51,7 @@ if (process.env.GITHUB_WORKSPACE) {
   });
 } else {
   isGithub = false;
-  debug = false; // ENABLE DEBUG HERE
+  debug = true; // ENABLE DEBUG HERE
   head = 'origin/main';
   feature = 'origin/dev';
   similarity = '50';
@@ -79,12 +79,17 @@ async function run() {
       Chalk.green(']\n'),
     );
 
+    await git.fetch(head);
+    await git.fetch(feature);
+    await git.checkout(head);
+    await git.checkout(feature);
+
     if (isGithub) {
       // fetch both refs
-      // await git.fetch(head);
-      // await git.fetch(feature);
-      // await git.checkout(head);
-      // await git.checkout(feature);
+      await git.fetch(head);
+      await git.fetch(feature);
+      await git.checkout(head);
+      await git.checkout(feature);
     }
 
     if (debug === true) {
