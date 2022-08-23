@@ -7,7 +7,6 @@ import Chalk from 'chalk';
 // eslint-disable-next-line import/no-named-as-default
 import simpleGit from 'simple-git';
 import process from 'process';
-import fs from 'fs';
 
 let head;
 let feature;
