@@ -8,9 +8,9 @@ inputs:
     description: "git HEAD (branch|SHA|tag)"
     required: true
     type: string
-    default: "main"
+    default: "origin/main"
   feature:
-    description: "git feature (branch|SHA|tag)"
+    description: "git feature (branch|SHA|tag) usually the branch you're running this from"
     required: true
     type: string
     default: "dev"

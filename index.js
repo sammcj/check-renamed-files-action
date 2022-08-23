@@ -69,6 +69,13 @@ async function run() {
   try {
     const git = simpleGit(path);
 
+    const currentBranch = await (await git.raw('rev-parse', '--abbrev-ref', 'HEAD')).trimEnd();
+
+    if (currentBranch !== feature) {
+      core.setFailed(`Current branch is ${JSON.stringify(currentBranch)}, expected ${feature}`);
+      return ExitCode.Failure;
+    }
+
     console.log(
       Chalk.green('[ Comparing HEAD:'),
       Chalk.bgGreen.bold(head),
@@ -119,11 +126,14 @@ async function run() {
     ]);
 
     const diffClean = diff.split(/\r?\n/) // Split input text into an array of lines
-      .filter(line => line.trim() !== '') // Filter out lines that are empty or contain only whitespace
-      .join('\n'); // Join line array into a string
+      .filter((line) => line.length > 0)
+      .map((file) => file.split('\n'))
+
+    console.log(diff);
+    console.log(diffClean);
 
     const modifiedFiles = diffClean.split('\n');
-    const modifiedFilesArray = modifiedFiles.map((file) => file.split('\n'));
+    const modifiedFilesArray = modifiedFiles//.map((file) => file.split('\n'));
 
     if (modifiedFiles.length > 0) {
       const errorString = `ERROR ${modifiedFiles.length} modified files with filter ${diffFilter} found in ${path} !\n`
