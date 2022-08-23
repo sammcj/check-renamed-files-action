@@ -52,8 +52,8 @@ if (process.env.GITHUB_WORKSPACE) {
 } else {
   isGithub = false;
   debug = false; // ENABLE DEBUG HERE
-  head = 'main';
-  feature = 'dev';
+  head = 'origin/main';
+  feature = 'origin/dev';
   similarity = '50';
   diffFilter = 'M';
   path = process.cwd();
@@ -81,8 +81,10 @@ async function run() {
 
     if (isGithub) {
       // fetch both refs
-      await git.fetch(head);
-      await git.fetch(feature);
+      // await git.fetch(head);
+      // await git.fetch(feature);
+      // await git.checkout(head);
+      // await git.checkout(feature);
     }
 
     if (debug === true) {
@@ -107,8 +109,6 @@ async function run() {
           '\n#### END DEBUG ####\n',
         ))
     }
-
-    await git.checkout(feature);
 
     // diff two git branches for renamed files in the given path
     const diff = await git.diff([
