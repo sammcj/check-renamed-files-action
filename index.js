@@ -125,19 +125,11 @@ async function run() {
       path,
     ]);
 
-    const diffClean = diff.split(/\r?\n/) // Split input text into an array of lines
-      .filter((line) => line.length > 0)
-      .map((file) => file.split('\n'))
-
-    console.log(diff);
-    console.log(diffClean);
-
-    const modifiedFiles = diffClean.split('\n');
-    const modifiedFilesArray = modifiedFiles//.map((file) => file.split('\n'));
+    const modifiedFiles = diff.trim().split('\n')
 
     if (modifiedFiles.length > 0) {
-      const errorString = `ERROR ${modifiedFiles.length} modified files with filter ${diffFilter} found in ${path} !\n`
-      console.log(errorString, modifiedFilesArray);
+      const errorString = `ERROR ${modifiedFiles.length} modified files with filter ${diffFilter} found in ${path} !`
+      console.log(errorString, '\n', modifiedFiles);
       core.setFailed(errorString);
       ExitCode.Failure;
     } else {
