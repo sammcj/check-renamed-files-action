@@ -9,44 +9,66 @@ import simpleGit from 'simple-git';
 import process from 'process';
 import fs from 'fs';
 
-const head = core.getInput('head', {
-  required: true,
-  description: 'The name of the branch to compare against',
-  default: 'main',
-});
-const feature = core.getInput('feature', {
-  required: true,
-  description: 'The feature branch to compare against',
-  default: 'dev',
-});
-const path = core.getInput('path', {
-  required: false,
-  description: 'Path to compare, defaults to CWD',
-  default: './',
-});
-const similarity = core.getInput('similarity', {
-  required: true,
-  description: 'similarity (50 = 50%)',
-  default: '50',
-});
-const diffFilter = core.getInput('mode', {
-  required: false,
-  description: 'Check for modified or renamed files (R|M|A|C|D|T|U|X|B|*), defaults to R (renamed)',
-  default: 'R',
-});
+let head;
+let feature;
+let path;
+let diffFilter;
+let similarity;
+let isGithub;
+let debug;
 
-process.env.GITHUB_WORKSPACE = process.env.GITHUB_WORKSPACE || process.cwd();
+// Allow running locally without core.getInput
+if (process.env.GITHUB_WORKSPACE) {
+  isGithub = true;
+  head = core.getInput('head', {
+    required: true,
+    description: 'The name of the branch to compare against',
+    default: 'main',
+  });
+  feature = core.getInput('feature', {
+    required: true,
+    description: 'The feature branch to compare against',
+    default: 'dev',
+  });
+  path = core.getInput('path', {
+    required: false,
+    description: 'Path to compare, defaults to CWD',
+    default: '',
+  });
+  similarity = core.getInput('similarity', {
+    required: false,
+    description: 'similarity (50 = 50%)',
+    default: '50',
+  });
+  diffFilter = core.getInput('diffFilter', {
+    required: false,
+    description: 'Check for modified or renamed files (R|M|A|C|D|T|U|X|B|*), defaults to R (renamed)',
+    default: 'R',
+  });
+  debug = core.getBooleanInput('debug', {
+    required: false,
+    description: 'Enables debug output',
+    default: false,
+  });
+} else {
+  isGithub = false;
+  debug = false; // ENABLE DEBUG HERE
+  head = 'main';
+  feature = 'dev';
+  similarity = '50';
+  diffFilter = 'M';
+  path = process.cwd();
+  process.env.GITHUB_WORKSPACE = process.cwd()
+}
 
-// For stubbing purposes
-// const feature = 'dev'
-// const path = './';
-// const head = 'main'
-// const similarity = '50'
-// const diffFilter = 'M'
+// if path is an empty string, use the GITHUB_WORKSPACE environment variable
+if (path === '') {
+  path = process.env.GITHUB_WORKSPACE;
+}
 
 async function run() {
   try {
-    const git = simpleGit();
+    const git = simpleGit(path);
 
     console.log(
       Chalk.green('[ Comparing HEAD:'),
@@ -58,44 +80,44 @@ async function run() {
       Chalk.green(']\n'),
     );
 
-    // fetch both refs
-    await git.fetch(head);
-    await git.fetch(feature);
+    if (isGithub) {
+      // fetch both refs
+      await git.fetch(head);
+      await git.fetch(feature);
+    }
 
-    console.log(
-      await git.log(),
-    )
-
-    console.log(
-      diffFilter,
-      similarity,
-      head,
-      feature,
-      `${process.env.GITHUB_WORKSPACE}/${path}`,
-      process.cwd(),
-    )
-
-    fs.readdir(`${process.env.GITHUB_WORKSPACE}/${path}`, (err, files) => {
-      if (err) {
-        throw err;
-      }
-
-      // files object contains all files names
-      // log them on console
-      files.forEach(file => {
-        console.log(file);
-      });
-    });
+    if (debug === true) {
+      process.env.DEBUG='simple-git:task:*,simple-git:output:*'
+      console.log(
+        Chalk.red(
+          '\n#### START DEBUG####\n',
+          '\ndiffFilter = ' + diffFilter,
+          '\nsimilarity = ' + similarity,
+          '\nhead = ' + head,
+          '\nfeature = ' + feature,
+          '\n########',
+          '\nworkspaces = ' + process.env.GITHUB_WORKSPACE,
+          '\npath = ' + path,
+          '\nprocess.cwd() = ' + process.cwd(),
+          '\n########\n',
+          '\ngit log:\n'),
+        await git.log(),
+        '\ngit status:\n',
+        await git.status(),
+        Chalk.red(
+          '\n#### END DEBUG ####\n',
+        ))
+    }
 
     // diff two git branches for renamed files in the given path
     const diff = await git.diff([
       '--name-only',
-      `--diff-filter=${diffFilter || 'R' }`,
-      `--find-renames=${similarity || '50' }%`,
+      `--diff-filter=${diffFilter}`,
+      `--find-renames=${similarity}%`,
       head,
       feature,
       '--',
-      `${process.env.GITHUB_WORKSPACE}/${path}`,
+      path,
     ]);
 
     const diffClean = diff.split(/\r?\n/) // Split input text into an array of lines
@@ -106,9 +128,9 @@ async function run() {
     const modifiedFilesArray = modifiedFiles.map((file) => file.split('\n'));
 
     if (modifiedFiles.length > 1) {
-      core.setOutput(`modified files with filter ${diffFilter} found in ${path}:`, modifiedFilesArray);
-      console.log(modifiedFilesArray);
-      core.setFailed(`ERROR: ${modifiedFiles.length} Modified files with filter ${diffFilter} found in ${path} !`);
+      const errorString = `ERROR ${modifiedFiles.length} modified files with filter ${diffFilter} found in ${path} !`
+      console.log(errorString, modifiedFilesArray);
+      core.setFailed(errorString);
       ExitCode.Failure;
     } else {
       console.log(Chalk.green(`No modified files with filter ${diffFilter} found in ${path}\n`));

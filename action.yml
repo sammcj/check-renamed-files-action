@@ -25,7 +25,7 @@ inputs:
     default: 50
   diffFilter:
     description: "The git diff filter to use when comparing files (R|M|A|C|D|T|U|X|B|*), defaults to R (renamed)"
-    required: false
+    required: true
     type: string
     default: "R"
 outputs:
