@@ -7,6 +7,7 @@ import Chalk from 'chalk';
 // eslint-disable-next-line import/no-named-as-default
 import simpleGit from 'simple-git';
 import process from 'process';
+import fs from 'fs';
 
 const head = core.getInput('head', {
   required: true,
@@ -60,6 +61,31 @@ async function run() {
     // fetch both refs
     await git.fetch(head);
     await git.fetch(feature);
+
+    console.log(
+      await git.log(),
+    )
+
+    console.log(
+      diffFilter,
+      similarity,
+      head,
+      feature,
+      `${process.env.GITHUB_WORKSPACE}/${path}`,
+      process.cwd(),
+    )
+
+    fs.readdir(`${process.env.GITHUB_WORKSPACE}/${path}`, (err, files) => {
+      if (err) {
+        throw err;
+      }
+
+      // files object contains all files names
+      // log them on console
+      files.forEach(file => {
+        console.log(file);
+      });
+    });
 
     // diff two git branches for renamed files in the given path
     const diff = await git.diff([
