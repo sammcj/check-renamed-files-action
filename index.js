@@ -76,6 +76,8 @@ async function run() {
       return ExitCode.Failure;
     }
 
+    // TODO: Detect if any modified files in the feature branch have an older datestamp in the name that existing files in the HEAD branch
+
     console.log(
       Chalk.green('[ Comparing HEAD:'),
       Chalk.bgGreen.bold(head),
