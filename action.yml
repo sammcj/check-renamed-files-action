@@ -1,0 +1,41 @@
+name: "Check for renamed files"
+description: "Checks if any files have been renamed between two git refs in a given path"
+branding:
+  icon: "edit-3"
+  color: "yellow"
+inputs:
+  head:
+    description: "git HEAD (branch|SHA|tag)"
+    required: true
+    type: string
+    default: "origin/main"
+  feature:
+    description: "git feature (branch|SHA|tag) usually the branch you're running this from"
+    required: true
+    type: string
+    default: "dev"
+  path:
+    description: "Path to compare, defaults to CWD"
+    required: false
+    type: string
+  similarity:
+    description: "Similarity threshold (50 = 50%)"
+    required: false
+    type: number
+    default: 50
+  diffFilter:
+    description: "The git diff filter to use when comparing files (R|M|A|C|D|T|U|X|B|*), defaults to R (renamed)"
+    required: false
+    type: string
+    default: "R"
+  debug:
+    description: "Enable debug output"
+    required: false
+    type: boolean
+    default: false
+outputs:
+  modifiedFiles:
+    description: "List of modified files"
+runs:
+  using: "node16"
+  main: "index.js"
