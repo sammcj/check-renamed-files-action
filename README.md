@@ -5,7 +5,7 @@ This action checks for renamed files between two git refs.
 ## Inputs
 
 - `head`: The first ref to check (defaults to origin/main).
-- `feature`: The second ref to check, usually the branch you're running this from (defaults to dev, recommended to use ${{ github.ref_name }}).
+- `feature`: The second ref to check, usually the branch you're running this from (defaults to dev, recommended to use ${{ github.head_ref }}).
 - `path`: The path to the file to check (defaults to working directory).
 - `similarity`: The similarity threshold to use when comparing files, is treated as a percentage (defaults to 50).
 - `diffFilter`: The git diff filter to use when comparing files (R|M|A|C|D|T|U|X|B|*), defaults to R (renamed).
@@ -20,9 +20,8 @@ This action checks for renamed files between two git refs.
 
 ```yaml
 name: Check for renamed files
-
 on:
-  merge:
+  pull_request:
     branches:
       - main
 
@@ -34,7 +33,7 @@ jobs:
     - uses: sammcj/check-renamed-files-action@main
       with:
         head: 'origin/main'
-        feature: ${{ github.ref_name }}
+        feature: ${{ github.head_ref }}
         path: src/main/resources/db/migration
         similarity: 50
         diffFilter: R

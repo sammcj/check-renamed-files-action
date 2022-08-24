@@ -76,11 +76,10 @@ async function run() {
   try {
     const git = simpleGit(path);
 
-    const currentBranch = await (await git.raw('rev-parse', '--abbrev-ref', 'HEAD')).trimEnd();
-    // a loop
+    const currentBranch = (await git.raw('rev-parse', '--abbrev-ref', 'HEAD')).trimEnd();
 
-    if (currentBranch !== feature) {
-      core.setFailed(`Current branch is ${JSON.stringify(currentBranch)}, expected ${feature}`);
+    if (currentBranch === head) {
+      core.setFailed(`Current branch is ${JSON.stringify(currentBranch)}, you must run this on the branch you wish to check, e.g. ${feature}`);
       return ExitCode.Failure;
     }
 
@@ -97,9 +96,11 @@ async function run() {
     );
 
     if (isGithub) {
-      // fetch both refs
+      // fetch and check out both refs
       await git.fetch(head);
       await git.fetch(feature);
+      await git.checkout(head);
+      await git.checkout(feature);
     }
 
     if (debug === true) {
@@ -139,6 +140,44 @@ async function run() {
     const modifiedFiles = diff.trim().split('\n').filter(file => file !== '');
 
     if (modifiedFiles.length > 0) {
+
+      if (checkFileNameDates) {
+        // Extract the date from the filenames for each modified file (e.g. V2022.02.02.2024__my_db_migration_abc.sql)
+        const modifiedFilesDate = modifiedFiles.map(file => {
+          const date = file.match(/V(\d{4}\.\d{2}\.\d{2}\.\d{4})/);
+          return date ? date[1] : null;
+        }).filter(date => date !== null);
+
+        // Compare the dates and alert if any are older than files on the head branch (e.g. V2022.02.02.2024 on head vs V2021.01.01.1111 on feature)
+        const headFiles = await git.raw(['ls-tree', '-r', '--name-only', head, '--', path]);
+        const headFilesDate = headFiles.split('\n').map(file => {
+          const date = file.match(/V(\d{4}\.\d{2}\.\d{2}\.\d{4})/);
+          return date ? date[1] : null;
+        }).filter(date => date !== null);
+        // Find the newest date on the head branch
+        const newestHeadDate = headFilesDate.reduce((a, b) => {
+          return a > b ? a : b;
+        }).split('.');
+        // Find the oldest date on the feature branch and assign it to a variable
+        const oldestFeatureDate = modifiedFilesDate.reduce((a, b) => {
+          return a < b ? a : b;
+        }).split('.');
+        // Compare the oldest date on the feature branch to the newest date on the head branch
+        if (newestHeadDate[0] > oldestFeatureDate[0]) {
+          const errorString = `ERROR ${oldestFeatureDate[0]} has an older datestamp than ${newestHeadDate[0]} !`
+          core.setFailed(errorString);
+          ExitCode.Failure;
+          console.log(Chalk.red(
+            Chalk.bgRedBright(
+              errorString,
+            )));
+          core.setFailed(errorString);
+          ExitCode.Failure;
+        } else {
+          console.log(Chalk.green('No modified files have names older than files on the head branch\n'));
+        }
+      }
+
       const errorString = `ERROR ${modifiedFiles.length} modified files with filter ${diffFilter} found in ${path} !`
       core.setFailed(errorString);
       ExitCode.Failure;
@@ -154,39 +193,7 @@ async function run() {
       console.log(Chalk.green(`No modified files with filter ${diffFilter} found in ${path}\n`));
     }
 
-    if (checkFileNameDates) {
-      // Extract the date from the filenames for each modified file (e.g. V2022.02.02.2024__my_db_migration_abc.sql)
-      const modifiedFilesDate = modifiedFiles.map(file => {
-        const date = file.match(/V(\d{4}\.\d{2}\.\d{2}\.\d{4})/);
-        return date ? date[1] : null;
-      }).filter(date => date !== null);
 
-      // Compare the dates and alert if any are older than files on the head branch (e.g. V2022.02.02.2024 vs V2021.01.01.1111)
-      const headFiles = await git.raw(['ls-tree', '-r', '--name-only', head, '--', path]);
-      const headFilesDate = headFiles.split('\n').map(file => {
-        const date = file.match(/V(\d{4}\.\d{2}\.\d{2}\.\d{4})/);
-        return date ? date[1] : null;
-      }).filter(date => date !== null);
-      const olderFiles = modifiedFilesDate.filter(date => headFilesDate.includes(date) === false);
-      if (olderFiles.length > 0) {
-        const errorString = `ERROR ${olderFiles.length} modified files are older than files on the head branch !`
-        console.log(Chalk.red(
-          errorString,
-          '\n',
-          'Files:',
-          Chalk.bgRedBright(
-            olderFiles,
-            '\n'),
-          Chalk.green(
-            'Head files:\n',
-            headFilesDate,
-          )));
-        core.setFailed(errorString);
-        ExitCode.Failure;
-      } else {
-        console.log(Chalk.green('No modified files are older than files on the head branch\n'));
-      }
-    }
 
   } catch (error) {
     core.setFailed(error.message);
