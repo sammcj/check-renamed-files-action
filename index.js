@@ -199,7 +199,7 @@ async function run() {
               date: date ? date[0] : '',
               number: number ? number[0] : '',
             }
-          }).filter(date => date !== null);
+          }).filter(file => file.date !== '' && file.number !== '');
           if (headFilesDate !== null) {
 
             // Find the headFilesDate with the newest date and highest number on the head branch
