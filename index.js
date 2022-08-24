@@ -136,6 +136,8 @@ async function run() {
     // Alert if there are any modified files with the given filter
     const modifiedFiles = diff.trim().split('\n')
 
+    console.log('modifiedFiles: ', modifiedFiles)
+
     if (modifiedFiles.length > 0) {
       const errorString = `ERROR ${modifiedFiles.length} modified files with filter ${diffFilter} found in ${path} !`
       core.setFailed(errorString);
