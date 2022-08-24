@@ -20,9 +20,8 @@ This action checks for renamed files between two git refs.
 
 ```yaml
 name: Check for renamed files
-
 on:
-  merge:
+  pull_request:
     branches:
       - main
 
