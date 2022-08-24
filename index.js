@@ -62,7 +62,7 @@ if (process.env.CI === 'true') {
   head = 'main'; // `origin/main`
   feature = 'dev'; //`dev`
   similarity = '50';
-  diffFilter = 'R';
+  diffFilter = 'RAM';
   path = '';
   process.env.GITHUB_WORKSPACE = process.cwd()
 }
@@ -154,27 +154,30 @@ async function run() {
           const date = file.match(/V(\d{4}\.\d{2}\.\d{2}\.\d{4})/);
           return date ? date[1] : null;
         }).filter(date => date !== null);
-        // Find the newest date on the head branch
-        const newestHeadDate = headFilesDate.reduce((a, b) => {
-          return a > b ? a : b;
-        }).split('.');
-        // Find the oldest date on the feature branch and assign it to a variable
-        const oldestFeatureDate = modifiedFilesDate.reduce((a, b) => {
-          return a < b ? a : b;
-        }).split('.');
-        // Compare the oldest date on the feature branch to the newest date on the head branch
-        if (newestHeadDate[0] > oldestFeatureDate[0]) {
-          const errorString = `ERROR ${oldestFeatureDate[0]} has an older datestamp than ${newestHeadDate[0]} !`
-          core.setFailed(errorString);
-          ExitCode.Failure;
-          console.log(Chalk.red(
-            Chalk.bgRedBright(
-              errorString,
-            )));
-          core.setFailed(errorString);
-          ExitCode.Failure;
-        } else {
-          console.log(Chalk.green('No modified files have names older than files on the head branch\n'));
+        if (headFilesDate > 0) {
+          // Find the newest date on the head branch
+          const newestHeadDate = headFilesDate.reduce((a, b) => {
+            return a > b ? a : b;
+          }).split('.');
+          // Find the oldest date on the feature branch and assign it to a variable
+          const oldestFeatureDate = modifiedFilesDate.reduce((a, b) => {
+            return a < b ? a : b;
+          }).split('.');
+
+          // Compare the oldest date on the feature branch to the newest date on the head branch
+          if (newestHeadDate[0] > oldestFeatureDate[0]) {
+            const errorString = `ERROR ${oldestFeatureDate[0]} has an older datestamp than ${newestHeadDate[0]} !`
+            core.setFailed(errorString);
+            ExitCode.Failure;
+            console.log(Chalk.red(
+              Chalk.bgRedBright(
+                errorString,
+              )));
+            core.setFailed(errorString);
+            ExitCode.Failure;
+          } else {
+            console.log(Chalk.green('No modified files have names older than files on the head branch\n'));
+          }
         }
       }
 
