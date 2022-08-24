@@ -10,10 +10,10 @@ inputs:
     type: string
     default: "origin/main"
   feature:
-    description: "git feature (branch|SHA|tag) usually the branch you're running this from"
+    description: "git feature (branch|SHA|tag) usually the branch you're running this from, defaults to ${{ github.ref_name }}"
     required: true
     type: string
-    default: "dev"
+    default: "${{ github.ref_name }}"
   path:
     description: "Path to compare, defaults to CWD"
     required: false
