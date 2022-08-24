@@ -76,11 +76,10 @@ async function run() {
   try {
     const git = simpleGit(path);
 
-    const currentBranch = await (await git.raw('rev-parse', '--abbrev-ref', 'HEAD')).trimEnd();
-    // a loop
+    const currentBranch = (await git.raw('rev-parse', '--abbrev-ref', 'HEAD')).trimEnd();
 
-    if (currentBranch !== feature) {
-      core.setFailed(`Current branch is ${JSON.stringify(currentBranch)}, expected ${feature}`);
+    if (currentBranch === head) {
+      core.setFailed(`Current branch is ${JSON.stringify(currentBranch)}, you must run this on the branch you wish to check, e.g. ${feature}`);
       return ExitCode.Failure;
     }
 
