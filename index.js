@@ -256,7 +256,7 @@ async function run() {
               core.setFailed(errorString);
               ExitCode.Failure;
             } else {
-              console.log(Chalk.green('No modified files have names older than files on the head branch\n'));
+              console.log(Chalk.green(`No modified files on ${feature} have names older than files on the ${head}\n`));
             }
           }
         } else {
