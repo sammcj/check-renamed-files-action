@@ -140,6 +140,44 @@ async function run() {
     const modifiedFiles = diff.trim().split('\n').filter(file => file !== '');
 
     if (modifiedFiles.length > 0) {
+
+      if (checkFileNameDates) {
+        // Extract the date from the filenames for each modified file (e.g. V2022.02.02.2024__my_db_migration_abc.sql)
+        const modifiedFilesDate = modifiedFiles.map(file => {
+          const date = file.match(/V(\d{4}\.\d{2}\.\d{2}\.\d{4})/);
+          return date ? date[1] : null;
+        }).filter(date => date !== null);
+
+        // Compare the dates and alert if any are older than files on the head branch (e.g. V2022.02.02.2024 on head vs V2021.01.01.1111 on feature)
+        const headFiles = await git.raw(['ls-tree', '-r', '--name-only', head, '--', path]);
+        const headFilesDate = headFiles.split('\n').map(file => {
+          const date = file.match(/V(\d{4}\.\d{2}\.\d{2}\.\d{4})/);
+          return date ? date[1] : null;
+        }).filter(date => date !== null);
+        // Find the newest date on the head branch
+        const newestHeadDate = headFilesDate.reduce((a, b) => {
+          return a > b ? a : b;
+        }).split('.');
+        // Find the oldest date on the feature branch and assign it to a variable
+        const oldestFeatureDate = modifiedFilesDate.reduce((a, b) => {
+          return a < b ? a : b;
+        }).split('.');
+        // Compare the oldest date on the feature branch to the newest date on the head branch
+        if (newestHeadDate[0] > oldestFeatureDate[0]) {
+          const errorString = `ERROR ${oldestFeatureDate[0]} has an older datestamp than ${newestHeadDate[0]} !`
+          core.setFailed(errorString);
+          ExitCode.Failure;
+          console.log(Chalk.red(
+            Chalk.bgRedBright(
+              errorString,
+            )));
+          core.setFailed(errorString);
+          ExitCode.Failure;
+        } else {
+          console.log(Chalk.green('No modified files have names older than files on the head branch\n'));
+        }
+      }
+
       const errorString = `ERROR ${modifiedFiles.length} modified files with filter ${diffFilter} found in ${path} !`
       core.setFailed(errorString);
       ExitCode.Failure;
@@ -155,42 +193,7 @@ async function run() {
       console.log(Chalk.green(`No modified files with filter ${diffFilter} found in ${path}\n`));
     }
 
-    if (checkFileNameDates) {
-      // Extract the date from the filenames for each modified file (e.g. V2022.02.02.2024__my_db_migration_abc.sql)
-      const modifiedFilesDate = modifiedFiles.map(file => {
-        const date = file.match(/V(\d{4}\.\d{2}\.\d{2}\.\d{4})/);
-        return date ? date[1] : null;
-      }).filter(date => date !== null);
 
-      // Compare the dates and alert if any are older than files on the head branch (e.g. V2022.02.02.2024 vs V2021.01.01.1111)
-      const headFiles = await git.raw(['ls-tree', '-r', '--name-only', head, '--', path]);
-      const headFilesDate = headFiles.split('\n').map(file => {
-        const date = file.match(/V(\d{4}\.\d{2}\.\d{2}\.\d{4})/);
-        return date ? date[1] : null;
-      }).filter(date => date !== null);
-      // Find the newest date on the head branch
-      const newestHeadDate = headFilesDate.reduce((a, b) => {
-        return a > b ? a : b;
-      }).split('.');
-      // Find the oldest date on the feature branch and assign it to a variable
-      const oldestFeatureDate = modifiedFilesDate.reduce((a, b) => {
-        return a < b ? a : b;
-      }).split('.');
-      // Compare the oldest date on the feature branch to the newest date on the head branch
-      if (newestHeadDate[0] > oldestFeatureDate[0]) {
-        const errorString = `ERROR ${oldestFeatureDate[0]} has an older datestamp than ${newestHeadDate[0]} !`
-        core.setFailed(errorString);
-        ExitCode.Failure;
-        console.log(Chalk.red(
-          Chalk.bgRedBright(
-            errorString,
-          )));
-        core.setFailed(errorString);
-        ExitCode.Failure;
-      } else {
-        console.log(Chalk.green('No modified files are older than files on the head branch\n'));
-      }
-    }
 
   } catch (error) {
     core.setFailed(error.message);
