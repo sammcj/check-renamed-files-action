@@ -49,7 +49,7 @@ Any combination of the filter characters (including none) can be used.
 
 When `*` (All-or-none) is added to the combination, all paths are selected if there is any file that matches other criteria in the comparison; if there is no file that matches other criteria, nothing is selected.
 
-- `A` - Select only files that are Added
+- `A` - Added
 - `C` - Copied
 - `D` - Deleted
 - `M` - Modified
