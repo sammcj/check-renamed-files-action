@@ -15,6 +15,7 @@ let diffFilter;
 let similarity;
 let isGithub;
 let debug;
+let checkFileNameDates;
 
 // Allow running locally without core.getInput
 if (process.env.GITHUB_WORKSPACE) {
@@ -22,7 +23,7 @@ if (process.env.GITHUB_WORKSPACE) {
   head = core.getInput('head', {
     required: true,
     description: 'The name of the branch to compare against',
-    default: 'main',
+    default: 'origin/main',
   });
   feature = core.getInput('feature', {
     required: true,
@@ -44,6 +45,11 @@ if (process.env.GITHUB_WORKSPACE) {
     description: 'Check for modified or renamed files (R|M|A|C|D|T|U|X|B|*), defaults to R (renamed)',
     default: 'R',
   });
+  checkFileNameDates = core.getBooleanInput('checkFileNameDates', {
+    required: false,
+    description: 'Enables checking of dates in file names with the format VYYYY.MM.DD.NNNN, e.g. V2022.02.02.2024',
+    default: false,
+  });
   debug = core.getBooleanInput('debug', {
     required: false,
     description: 'Enables debug output',
@@ -52,6 +58,7 @@ if (process.env.GITHUB_WORKSPACE) {
 } else {
   isGithub = false;
   debug = false; // ENABLE DEBUG HERE
+  checkFileNameDates = true;
   head = 'main'; // `origin/main`
   feature = 'dev'; //`origin/dev`
   similarity = '50';
@@ -145,36 +152,38 @@ async function run() {
       console.log(Chalk.green(`No modified files with filter ${diffFilter} found in ${path}\n`));
     }
 
-    // Extract the date from the filenames for each modified file (e.g. V2022.02.02.2024__my_db_migration_abc.sql)
-    const modifiedFilesDate = modifiedFiles.map(file => {
-      const date = file.match(/V(\d{4}\.\d{2}\.\d{2}\.\d{4})/);
-      return date ? date[1] : null;
-    }).filter(date => date !== null);
+    if (checkFileNameDates) {
+      // Extract the date from the filenames for each modified file (e.g. V2022.02.02.2024__my_db_migration_abc.sql)
+      const modifiedFilesDate = modifiedFiles.map(file => {
+        const date = file.match(/V(\d{4}\.\d{2}\.\d{2}\.\d{4})/);
+        return date ? date[1] : null;
+      }).filter(date => date !== null);
 
-    // Compare the dates and alert if any are older than files on the head branch (e.g. V2022.02.02.2024 vs V2021.01.01.1111)
-    const headFiles = await git.raw(['ls-tree', '-r', '--name-only', head, '--', path]);
-    const headFilesDate = headFiles.split('\n').map(file => {
-      const date = file.match(/V(\d{4}\.\d{2}\.\d{2}\.\d{4})/);
-      return date ? date[1] : null;
-    }).filter(date => date !== null);
-    const olderFiles = modifiedFilesDate.filter(date => headFilesDate.includes(date) === false);
-    if (olderFiles.length > 0) {
-      const errorString = `ERROR ${olderFiles.length} modified files are older than files on the head branch !`
-      console.log(Chalk.red(
-        errorString,
-        '\n',
-        'Files:',
-        Chalk.bgRedBright(
-          olderFiles,
-          '\n'),
-        Chalk.green(
-          'Head files:\n',
-          headFilesDate,
-        )));
-      core.setFailed(errorString);
-      ExitCode.Failure;
-    } else {
-      console.log(Chalk.green('No modified files are older than files on the head branch\n'));
+      // Compare the dates and alert if any are older than files on the head branch (e.g. V2022.02.02.2024 vs V2021.01.01.1111)
+      const headFiles = await git.raw(['ls-tree', '-r', '--name-only', head, '--', path]);
+      const headFilesDate = headFiles.split('\n').map(file => {
+        const date = file.match(/V(\d{4}\.\d{2}\.\d{2}\.\d{4})/);
+        return date ? date[1] : null;
+      }).filter(date => date !== null);
+      const olderFiles = modifiedFilesDate.filter(date => headFilesDate.includes(date) === false);
+      if (olderFiles.length > 0) {
+        const errorString = `ERROR ${olderFiles.length} modified files are older than files on the head branch !`
+        console.log(Chalk.red(
+          errorString,
+          '\n',
+          'Files:',
+          Chalk.bgRedBright(
+            olderFiles,
+            '\n'),
+          Chalk.green(
+            'Head files:\n',
+            headFilesDate,
+          )));
+        core.setFailed(errorString);
+        ExitCode.Failure;
+      } else {
+        console.log(Chalk.green('No modified files are older than files on the head branch\n'));
+      }
     }
 
   } catch (error) {

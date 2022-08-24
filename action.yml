@@ -28,6 +28,11 @@ inputs:
     required: false
     type: string
     default: "R"
+  checkFileNameDates:
+    description: "Enables checking of dates in file names with the format VYYYY.MM.DD.NNNN, e.g. V2022.02.02.2024"
+    required: false
+    type: boolean
+    default: false
   debug:
     description: "Enable debug output"
     required: false

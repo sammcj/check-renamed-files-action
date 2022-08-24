@@ -9,6 +9,7 @@ This action checks for renamed files between two git refs.
 - `path`: The path to the file to check (defaults to working directory).
 - `similarity`: The similarity threshold to use when comparing files, is treated as a percentage (defaults to 50).
 - `diffFilter`: The git diff filter to use when comparing files (R|M|A|C|D|T|U|X|B|*), defaults to R (renamed).
+- `checkFileNameDates`: Enables checking of dates in file names with the format VYYYY.MM.DD.NNNN (e.g. V2022.02.02.2024)
 - `debug`: Whether to output debug information (true|false).
 
 ## Outputs
@@ -37,6 +38,7 @@ jobs:
         path: src/main/resources/db/migration
         similarity: 50
         diffFilter: R
+        checkFileNameDates: false
         debug: false
 ```
 
