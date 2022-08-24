@@ -95,12 +95,6 @@ async function run() {
       Chalk.green(']\n'),
     );
 
-    if (isGithub) {
-      // fetch both refs
-      await git.fetch(head);
-      await git.fetch(feature);
-    }
-
     if (debug === true) {
       console.log(
         Chalk.red(
