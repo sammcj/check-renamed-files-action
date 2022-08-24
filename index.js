@@ -69,7 +69,7 @@ if (process.env.CI === 'true') {
 }
 
 // prepend the path with GITHUB_WORKSPACE if it's not absolute
-if (path.isAbsolute(searchPath)) {
+if (!path.isAbsolute(searchPath)) {
   searchPath = `${process.env.GITHUB_WORKSPACE}/${searchPath}`;
 }
 
