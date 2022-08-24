@@ -2,6 +2,12 @@
 
 This action checks for renamed files between two git refs.
 
+## Assumptions
+
+*Lots*! I whipped this up to solve a specific use case in mind for checking if database migrations files on a PR were renamed from or older than on the main branch, but it wouldn't take much to adapt it for more generic cases - mostly some additional parasitisation of filters / regexes for file names.
+
+- For checkFileNameDates to work, the dates in the filenames much be of format VYYYY.MM.DD.NNNN__string, e.g. V2019.01.01.0000__some_string.sql
+
 ## Inputs
 
 - `head`: The first ref to check (defaults to origin/main).
