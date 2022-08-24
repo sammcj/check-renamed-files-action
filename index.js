@@ -43,8 +43,8 @@ if (process.env.CI === 'true') {
   });
   diffFilter = core.getInput('diffFilter', {
     required: false,
-    description: 'Check for modified or renamed files (R|M|A|C|D|T|U|X|B|*), defaults to R (renamed)',
-    default: 'R',
+    description: 'Check for modified or renamed files (R|M|A|C|D|T|U|X|B|*), defaults to RAM (renamed, added, modified)',
+    default: 'RAM',
   });
   checkFileNameDates = core.getBooleanInput('checkFileNameDates', {
     required: false,

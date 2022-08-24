@@ -25,10 +25,10 @@ inputs:
     type: number
     default: 50
   diffFilter:
-    description: "The git diff filter to use when comparing files (R|M|A|C|D|T|U|X|B|*), defaults to R (renamed)"
+    description: "The git diff filter to use when comparing files (R|M|A|C|D|T|U|X|B|*), defaults to R (renamed, added, modified)"
     required: false
     type: string
-    default: "R"
+    default: "RAM"
   checkFileNameDates:
     description: "Enables checking of dates in file names with the format VYYYY.MM.DD.NNNN, e.g. V2022.02.02.2024"
     required: false
