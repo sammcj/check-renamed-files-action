@@ -55,7 +55,7 @@ if (process.env.GITHUB_WORKSPACE) {
   head = 'main'; // `origin/main`
   feature = 'dev'; //`origin/dev`
   similarity = '50';
-  diffFilter = 'M';
+  diffFilter = 'A';
   path = '';
   process.env.GITHUB_WORKSPACE = process.cwd()
 }
@@ -70,6 +70,7 @@ async function run() {
     const git = simpleGit(path);
 
     const currentBranch = await (await git.raw('rev-parse', '--abbrev-ref', 'HEAD')).trimEnd();
+    // a loop
 
     if (currentBranch !== feature) {
       core.setFailed(`Current branch is ${JSON.stringify(currentBranch)}, expected ${feature}`);
@@ -130,7 +131,14 @@ async function run() {
 
     if (modifiedFiles.length > 0) {
       const errorString = `ERROR ${modifiedFiles.length} modified files with filter ${diffFilter} found in ${path} !`
-      console.log(errorString, '\n', modifiedFiles);
+      core.setFailed(errorString);
+      ExitCode.Failure;
+      console.log(Chalk.red(
+        errorString,
+        '\n',
+        'Files:',
+        Chalk.bgRedBright(
+          modifiedFiles)));
       core.setFailed(errorString);
       ExitCode.Failure;
     } else {
@@ -143,24 +151,31 @@ async function run() {
       return date ? date[1] : null;
     }).filter(date => date !== null);
 
-    console.log(modifiedFilesDate)
-
-
-    // Detect if any modified files in the feature branch have an older datestamp in the filename (e.g. V2022.02.02.2024__my_db_migration_abc.sql)
-    // than the filenames existing in the HEAD branch (e.g. V2022.07.10.1234__existing_older_db_migration.sql), if so, fail the action.
-    // const modifiedFilesWithOlderDate = modifiedFiles.filter(file => {
-    //   const fileName = file.split('/').pop();
-    //   const fileDate = fileName.split('__')[0];
-    //   const headFile = `${path}/${file}`;
-    //   const headFileDate = (
-    //     git.log({ file: headFile })).split('\n')[0].split(' ')[0]; //await?
-    //   return fileDate < headFileDate;
-    // }).length;
-    // if (modifiedFilesWithOlderDate > 0) {
-    //   core.setFailed(`${modifiedFilesWithOlderDate} modified files in the feature branch have an older datestamp in the filename than the filenames existing in the HEAD branch.`);
-    //   return ExitCode.Failure;
-    // }
-
+    // Compare the dates and alert if any are older than files on the head branch (e.g. V2022.02.02.2024 vs V2021.01.01.1111)
+    const headFiles = await git.raw(['ls-tree', '-r', '--name-only', head, '--', path]);
+    const headFilesDate = headFiles.split('\n').map(file => {
+      const date = file.match(/V(\d{4}\.\d{2}\.\d{2}\.\d{4})/);
+      return date ? date[1] : null;
+    }).filter(date => date !== null);
+    const olderFiles = modifiedFilesDate.filter(date => headFilesDate.includes(date) === false);
+    if (olderFiles.length > 0) {
+      const errorString = `ERROR ${olderFiles.length} modified files are older than files on the head branch !`
+      console.log(Chalk.red(
+        errorString,
+        '\n',
+        'Files:',
+        Chalk.bgRedBright(
+          olderFiles,
+          '\n'),
+        Chalk.green(
+          'Head files:\n',
+          headFilesDate,
+        )));
+      core.setFailed(errorString);
+      ExitCode.Failure;
+    } else {
+      console.log(Chalk.green('No modified files are older than files on the head branch\n'));
+    }
 
   } catch (error) {
     core.setFailed(error.message);
