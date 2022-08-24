@@ -7,10 +7,11 @@ import Chalk from 'chalk';
 // eslint-disable-next-line import/no-named-as-default
 import simpleGit from 'simple-git';
 import process from 'process';
+import path from 'path';
 
 let head;
 let feature;
-let path;
+let searchPath;
 let diffFilter;
 let similarity;
 let isGithub;
@@ -30,7 +31,7 @@ if (process.env.CI === 'true') {
     description: 'The feature branch to compare against',
     default: 'dev',
   });
-  path = core.getInput('path', {
+  searchPath = core.getInput('path', {
     required: false,
     description: 'Path to compare, defaults to CWD',
     default: '',
@@ -63,18 +64,18 @@ if (process.env.CI === 'true') {
   feature = 'dev'; //`dev`
   similarity = '50';
   diffFilter = 'RAM';
-  path = '';
+  searchPath = '';
   process.env.GITHUB_WORKSPACE = process.cwd()
 }
 
-// if path is an empty string, use the GITHUB_WORKSPACE environment variable
-if (path === '') {
-  path = process.env.GITHUB_WORKSPACE;
+// prepend the path with GITHUB_WORKSPACE if it's not absolute
+if (path.isAbsolute(searchPath)) {
+  searchPath = `${process.env.GITHUB_WORKSPACE}/${searchPath}`;
 }
 
 async function run() {
   try {
-    const git = simpleGit(path);
+    const git = simpleGit(searchPath);
 
     const currentBranch = (await git.raw('rev-parse', '--abbrev-ref', 'HEAD')).trimEnd();
 
@@ -89,7 +90,7 @@ async function run() {
       Chalk.green('and FEATURE:'),
       Chalk.bgBlue.bold(feature),
       Chalk.green('in PATH:'),
-      Chalk.bgMagenta.bold(path),
+      Chalk.bgMagenta.bold(searchPath),
       Chalk.green('with Filter:'),
       Chalk.bgYellow.bold(diffFilter),
       Chalk.green(']\n'),
@@ -113,7 +114,7 @@ async function run() {
           '\nfeature = ' + feature,
           '\n########',
           '\nworkspaces = ' + process.env.GITHUB_WORKSPACE,
-          '\npath = ' + path,
+          '\npath (searchPath) = ' + searchPath,
           '\nprocess.cwd() = ' + process.cwd(),
           '\n########\n',
           '\ngit log:\n'),
@@ -133,7 +134,7 @@ async function run() {
       head,
       feature,
       '--',
-      path,
+      searchPath,
     ]);
 
     // Clean up modified files to ensure no false positives with empty lines
@@ -149,7 +150,7 @@ async function run() {
         }).filter(date => date !== null);
 
         // Compare the dates and alert if any are older than files on the head branch (e.g. V2022.02.02.2024 on head vs V2021.01.01.1111 on feature)
-        const headFiles = await git.raw(['ls-tree', '-r', '--name-only', head, '--', path]);
+        const headFiles = await git.raw(['ls-tree', '-r', '--name-only', head, '--', searchPath]);
         const headFilesDate = headFiles.split('\n').map(file => {
           const date = file.match(/V(\d{4}\.\d{2}\.\d{2}\.\d{4})/);
           return date ? date[1] : null;
@@ -181,7 +182,7 @@ async function run() {
         }
       }
 
-      const errorString = `ERROR ${modifiedFiles.length} modified files with filter ${diffFilter} found in ${path} !`
+      const errorString = `ERROR ${modifiedFiles.length} modified files with filter ${diffFilter} found in ${searchPath} !`
       core.setFailed(errorString);
       ExitCode.Failure;
       console.log(Chalk.red(
@@ -193,7 +194,7 @@ async function run() {
       core.setFailed(errorString);
       ExitCode.Failure;
     } else {
-      console.log(Chalk.green(`No modified files with filter ${diffFilter} found in ${path}\n`));
+      console.log(Chalk.green(`No modified files with filter ${diffFilter} found in ${searchPath}\n`));
     }
 
 
