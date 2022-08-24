@@ -62,7 +62,7 @@ if (process.env.CI === 'true') {
   head = 'main'; // `origin/main`
   feature = 'dev'; //`dev`
   similarity = '50';
-  diffFilter = 'R';
+  diffFilter = 'RAM';
   path = '';
   process.env.GITHUB_WORKSPACE = process.cwd()
 }
