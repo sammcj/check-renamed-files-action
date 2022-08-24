@@ -10,7 +10,7 @@ inputs:
     type: string
     default: "origin/main"
   feature:
-    description: "git feature (branch|SHA|tag) usually the branch you're running this from, recommended to use ${{ github.ref_name }}"
+    description: "git feature (branch|SHA|tag) usually the branch you're running this from, recommended to use github.ref_name"
     required: true
     type: string
     default: "dev"
