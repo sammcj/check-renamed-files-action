@@ -34,7 +34,7 @@ if (process.env.CI === 'true') {
   searchPath = core.getInput('path', {
     required: false,
     description: 'Path to compare, defaults to CWD',
-    default: '',
+    default: '.',
   });
   similarity = core.getInput('similarity', {
     required: false,
@@ -64,7 +64,7 @@ if (process.env.CI === 'true') {
   feature = 'dev'; //`dev`
   similarity = '50';
   diffFilter = 'RAM';
-  searchPath = '';
+  searchPath = '.';
   process.env.GITHUB_WORKSPACE = process.cwd()
 }
 

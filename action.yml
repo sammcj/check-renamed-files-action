@@ -17,6 +17,7 @@ inputs:
   path:
     description: "Path to compare, defaults to CWD"
     required: false
+    default: '.'
     type: string
   similarity:
     description: "Similarity threshold (50 = 50%)"
