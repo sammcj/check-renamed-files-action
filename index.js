@@ -137,42 +137,44 @@ async function run() {
       searchPath,
     ]);
 
-    // If the diffFilter contains the letter 'R' (renamed) then we need to check for renamed files
-    if (diffFilter.includes('R')) {
     // Clean up modified files to ensure no false positives with empty lines
-      const modifiedFiles = diff.trim().split('\n').filter(file => file !== '');
+    const modifiedFiles = diff.trim().split('\n').filter(file => file !== '');
 
-      if (modifiedFiles.length > 0) {
-        // check if the modified files from the diff were renamed
-        const renamedDiff = await git.diff([
-          '--name-only',
-          '--diff-filter=R',
-          `--find-renames=${similarity}%`,
-          `--find-copies=${similarity}%`,
-          head,
-          feature,
-          '--',
-          searchPath,
-        ]);
+    // If the diffFilter contains the letter 'R' (renamed) then we need to check for renamed files
+    if (diffFilter.includes('R') && modifiedFiles.length > 0) {
+
+      // check if the modified files from the diff were renamed
+      const renamedDiff = await git.diff([
+        '--name-only',
+        '--diff-filter=R',
+        `--find-renames=${similarity}%`,
+        head,
+        feature,
+        '--',
+        searchPath,
+      ]);
         // Check specifically for renamed files
         // Clean up modified files to ensure no false positives with empty lines
-        const renamedFiles = renamedDiff.trim().split('\n').filter(file => file !== '');
-        if (renamedFiles.length > 0) {
-          const errorString = `ERROR ${modifiedFiles.length} modified files with filter ${diffFilter} found in ${searchPath} !`
-          core.setFailed(errorString);
-          ExitCode.Failure;
-          console.log(Chalk.red(
-            errorString,
-            '\n',
-            'Files:',
-            Chalk.bgRedBright(
-              modifiedFiles)));
-          core.setFailed(errorString);
-          ExitCode.Failure;
-        } else {
-          console.log(Chalk.green(`No renamed files found in ${searchPath}\n`));
-        }
+      const renamedFiles = renamedDiff.trim().split('\n').filter(file => file !== '');
+      if (renamedFiles.length > 0) {
+        const errorString = `ERROR ${modifiedFiles.length} modified files with filter ${diffFilter} found in ${searchPath} !`
+        core.setFailed(errorString);
+        ExitCode.Failure;
+        console.log(Chalk.red(
+          errorString,
+          '\n',
+          'Files:',
+          Chalk.bgRedBright(
+            modifiedFiles)));
+        core.setFailed(errorString);
+        ExitCode.Failure;
+      } else {
+        console.log(Chalk.green(`No renamed files found in ${searchPath}\n`));
       }
+    }// End of rename block
+
+    // Check for other modified files
+    if (modifiedFiles.length > 0) {
 
       // Check the dates in the file names if enabled
       if (checkFileNameDates) {
@@ -212,11 +214,11 @@ async function run() {
           } else {
             console.log(Chalk.green('No modified files have names older than files on the head branch\n'));
           }
+        } else {
+          console.log(Chalk.green(`No other modified files with filter ${diffFilter} in ${searchPath}\n`));
         }
-      } else {
-        console.log(Chalk.green(`No other modified files with filter ${diffFilter} in ${searchPath}\n`));
       }
-    }
+    } // End of other modified files block
 
   } catch (error) {
     core.setFailed(error.message);
