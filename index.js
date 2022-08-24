@@ -91,6 +91,8 @@ async function run() {
       Chalk.bgBlue.bold(feature),
       Chalk.green('in PATH:'),
       Chalk.bgMagenta.bold(path),
+      Chalk.green('with Filter:'),
+      Chalk.bgYellow.bold(diffFilter),
       Chalk.green(']\n'),
     );
 
@@ -133,10 +135,8 @@ async function run() {
       path,
     ]);
 
-    // Alert if there are any modified files with the given filter
-    const modifiedFiles = diff.trim().split('\n')
-
-    console.log('modifiedFiles: ', modifiedFiles)
+    // Clean up modified files to ensure no false positives with empty lines
+    const modifiedFiles = diff.trim().split('\n').filter(file => file !== '');
 
     if (modifiedFiles.length > 0) {
       const errorString = `ERROR ${modifiedFiles.length} modified files with filter ${diffFilter} found in ${path} !`
