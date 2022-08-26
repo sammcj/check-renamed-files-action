@@ -163,8 +163,7 @@ async function run() {
         const renamedFiles = renamedDiff.trim().split('\n').filter(file => file !== '');
         if (renamedFiles.length > 0) {
           const errorString = `ERROR ${renamedFiles.length} renamed files found in ${searchPath} !`
-          core.setFailed(errorString);
-          ExitCode.Failure;
+
           console.log(Chalk.red(
             errorString,
             '\n',
@@ -173,7 +172,6 @@ async function run() {
               modifiedFiles),
           ));
           core.setFailed(errorString);
-
           ExitCode.Failure;
           console.log('\n---\n')
         } else {
