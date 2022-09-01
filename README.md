@@ -2,6 +2,9 @@
 
 This action checks for renamed files between two git refs.
 
+![Screen Shot 2022-09-01 at 2 45 09 pm](https://user-images.githubusercontent.com/862951/187833217-8a0c3309-496e-4704-9a21-dfae79408206.jpg)
+
+
 ## Assumptions
 
 *Lots*! I whipped this up to solve a specific use case in mind for checking if database migrations files on a PR were renamed from or older than on the main branch, but it wouldn't take much to adapt it for more generic cases - mostly some additional parasitisation of filters / regexes for file names.
