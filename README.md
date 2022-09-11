@@ -1,5 +1,9 @@
 # Check Renamed Files
 
+[![Build Status (latest push)](https://github.com/sammcj/check-renamed-files-action/workflows/Bump%20version/badge.svg)](https://github.com/sammcj/check-renamed-files-action/workflows/bump-version)
+[![Stable Version](https://img.shields.io/github/v/tag/sammcj/check-renamed-files-action)](https://img.shields.io/github/v/tag/sammcj/check-renamed-files-action)
+[![Latest Release](https://img.shields.io/github/v/release/sammcj/check-renamed-files-action?color=%233D9970)](https://img.shields.io/github/v/release/sammcj/check-renamed-files-action?color=%233D9970)
+
 This action checks for renamed files between two git refs.
 
 ![Screen Shot 2022-09-01 at 2 45 09 pm](https://user-images.githubusercontent.com/862951/187833217-8a0c3309-496e-4704-9a21-dfae79408206.jpg)
