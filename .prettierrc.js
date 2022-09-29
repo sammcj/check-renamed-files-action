@@ -1,7 +1,8 @@
+
 module.exports = {
   overrides: [
     {
-      files: ['*.yml'],
+      files: ['*.yml', '*.yaml'],
       options: { singleQuote: false },
     },
   ],
