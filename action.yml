@@ -7,41 +7,33 @@ inputs:
   head:
     description: "git HEAD (branch|SHA|tag)"
     required: true
-    type: string
     default: "origin/main"
   feature:
     description: "git feature (branch|SHA|tag) usually the branch you're running this from, recommended to use github.head_ref"
     required: true
-    type: string
     default: "dev"
   path:
     description: "Path to compare, defaults to CWD"
     required: false
     default: '.'
-    type: string
   similarity:
     description: "Similarity threshold (50 = 50%)"
-    required: false
-    type: number
-    default: 50
+    default: "50"
   diffFilter:
     description: "The git diff filter to use when comparing files (R|M|A|C|D|T|U|X|B|*), defaults to R (renamed, added, modified)"
     required: false
-    type: string
     default: "RAM"
   checkFileNameDates:
     description: "Enables checking of dates in file names with the format VYYYY.MM.DD.NNNN, e.g. V2022.02.02.2024"
     required: false
-    type: boolean
-    default: false
+    default: "false"
   debug:
     description: "Enable debug output"
     required: false
-    type: boolean
-    default: false
+    default: "false"
 outputs:
   modifiedFiles:
     description: "List of modified files"
 runs:
   using: "node16"
-  main: "index.js"
+  main: "dist/index.js"
