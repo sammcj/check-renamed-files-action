@@ -30,7 +30,7 @@ jobs:
   pr-labeller:
     name: "Pull Request Labeller"
     runs-on: ubuntu-22.04
-    timeout-minutes: 10
+    timeout-minutes: 5
     steps:
       - uses: fuxingloh/multi-labeler@v2 # tag=v2
         id: pr-labeller
