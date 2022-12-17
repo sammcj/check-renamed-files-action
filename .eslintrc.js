@@ -2,10 +2,8 @@
 
 // Required packages:
 // 'eslint-config-prettier'
-// 'eslint-plugin-deprecation'
 // 'eslint-plugin-import'
 // 'eslint-plugin-jest'
-// 'eslint-plugin-unused-imports'
 // 'eslint'
 // 'prettier-plugin-packagejson'
 // 'prettier'
@@ -45,8 +43,6 @@ module.exports = {
     'import/order': 'error',
     'prettier/prettier': 'error',
     'max-classes-per-file': ['error', 3],
-    /** no console and debugger in CDK  */
-    'no-console': 'error',
     'no-debugger': 'error',
     'no-underscore-dangle': 'off',
     'lines-between-class-members': ['error', 'always', { exceptAfterSingleLine: true }],

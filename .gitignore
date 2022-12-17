@@ -20,3 +20,5 @@ Session.vim
 .mu_repo
 
 megalinter-reports/
+
+node_modules/
