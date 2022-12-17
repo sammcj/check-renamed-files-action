@@ -9,18 +9,22 @@ import Chalk from 'chalk';
 // eslint-disable-next-line import/no-named-as-default
 import simpleGit from 'simple-git';
 
+import isCI from 'is-ci';
+
+if (isCI) {
+  console.log('The code is running on a CI server');
+}
+
 let head;
 let feature;
 let searchPath;
 let diffFilter;
 let similarity;
-let isGithub;
 let debug;
 let checkFileNameDates;
 
 // Allow running locally without core.getInput
-if (process.env.CI === 'true') {
-  isGithub = true;
+if (isCI) {
   head = core.getInput('head', {
     required: true,
     description: 'The name of the branch to compare against',
@@ -59,7 +63,6 @@ if (process.env.CI === 'true') {
     default: false,
   });
 } else {
-  isGithub = false;
   debug = true; // ENABLE DEBUG HERE
   checkFileNameDates = true;
   head = 'main'; // `origin/main`
@@ -104,7 +107,7 @@ async function run() {
     );
 
     // If we are running on actions, fetch and checkout both refs
-    if (isGithub) {
+    if (isCI) {
       await git.fetch(head);
       await git.fetch(feature);
       await git.checkout(head);
