@@ -34,7 +34,7 @@ jobs:
           similarity: 50
           diffFilter: RAM
           checkFileNameDates: false
-          debug: false
+          debug: true
 
       # Bump version
       - name: Bump version and push tag
