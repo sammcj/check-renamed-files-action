@@ -60,7 +60,7 @@ if (process.env.CI === 'true') {
   });
 } else {
   isGithub = false;
-  debug = false; // ENABLE DEBUG HERE
+  debug = true; // ENABLE DEBUG HERE
   checkFileNameDates = true;
   head = 'main'; // `origin/main`
   feature = 'dev'; //`dev`
