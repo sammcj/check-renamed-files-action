@@ -31,8 +31,8 @@ jobs:
       - name: test action locally
         uses: ./
         with:
-          head: 'origin/dev'
-          feature: ${{ github.head_ref }}
+          head: 'origin/main'
+          feature: 'origin/dev'
           path: src/main/resources/db/migration
           similarity: 50
           diffFilter: RAM
