@@ -2,7 +2,7 @@
   "name": "check-renamed-files",
   "version": "1.2.0",
   "description": "Github Action to check if any files have been renamed between two git refs in a given path",
-  "main": "index.js",
+  "main": "dist/index.js",
   "type": "module",
   "scripts": {
     "test": "jest",
@@ -10,7 +10,7 @@
     "eslint": "eslint --ignore-path .gitignore --max-warnings 0 \"./**/*.{js,ts}\"",
     "format-prettier": "npm run prettier --write",
     "prettier": "prettier --ignore-path .gitignore \"./**/*.{js,json,md,ts,yml}\"",
-    "build": "npx @vercel/ncc build -m index.js --minify --v8-cache"
+    "build": "npx @vercel/ncc build index.js --v8-cache"
   },
   "repository": {
     "type": "git",
