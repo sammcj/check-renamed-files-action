@@ -8982,7 +8982,7 @@ if (is_ci) {
 } else {
   debug = true; // ENABLE DEBUG HERE
   checkFileNameDates = true;
-  head = 'main'; // `origin/main`
+  head = 'origin/main'; // `origin/main`
   feature = 'dev'; //`dev`
   similarity = '50';
   diffFilter = 'RAM';
