@@ -31,7 +31,7 @@ jobs:
       - uses: ./
         with:
           head: 'origin/dev'
-          feature: 'origin/dev'
+          feature: ${{github.head_ref}}
           path: src/main/resources/db/migration
           similarity: 50
           diffFilter: RAM
