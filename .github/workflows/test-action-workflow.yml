@@ -24,7 +24,7 @@ jobs:
           node-version: 16
       - run: |
           npm ci
-          npm run build
+          # npm run build
       - uses: ./
         with:
           message: "test message"
